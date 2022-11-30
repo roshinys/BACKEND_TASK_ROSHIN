@@ -46,7 +46,7 @@ const http_1 = __importDefault(require("http"));
 const socket_io_1 = require("socket.io");
 const redis = __importStar(require("redis"));
 const authRoutes_1 = __importDefault(require("./routes/authRoutes"));
-const authenticate_1 = require("./middleware/authenticate");
+const fetchRoutes_1 = __importDefault(require("./routes/fetchRoutes"));
 (0, dotenv_1.config)();
 const app = (0, express_1.default)();
 app.use((0, cors_1.default)());
@@ -106,27 +106,28 @@ io.on("connection", (socket) => __awaiter(void 0, void 0, void 0, function* () {
     // });
 }));
 app.use("/", authRoutes_1.default);
-app.use("/fetchAll", authenticate_1.authenticate, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    yield redisClient.connect();
-    const user = req.user;
-    console.log(user);
-    const userId = user._id;
-    const allTodos = yield Todo_1.default.find({ userId: userId });
-    const todosList = allTodos.map((todo) => {
-        return todo.todo;
-    });
-    const redisTodos = yield redisClient.lRange("BACKEND_TASK_ROSHIN", 0, -1);
-    yield redisClient.disconnect();
-    redisTodos.forEach((x) => {
-        const userTodo = x.split(":");
-        const redisUserId = userTodo[0];
-        const redisTodo = userTodo[1];
-        if (userId == redisUserId) {
-            todosList.push(redisTodo);
-        }
-    });
-    res.json({ msg: "fetch all", todosList });
-}));
+app.use("/fetchAll", fetchRoutes_1.default);
+// app.use("/fetchAll", <any>authenticate, async (req, res) => {
+//   await redisClient.connect();
+//   const user: any = (<any>req).user;
+//   console.log(user);
+//   const userId = user._id;
+//   const allTodos = await Todo.find({ userId: userId });
+//   const todosList = allTodos.map((todo) => {
+//     return todo.todo;
+//   });
+//   const redisTodos = await redisClient.lRange("BACKEND_TASK_ROSHIN", 0, -1);
+//   await redisClient.disconnect();
+//   redisTodos.forEach((x) => {
+//     const userTodo = x.split(":");
+//     const redisUserId = userTodo[0];
+//     const redisTodo = userTodo[1];
+//     if (userId == redisUserId) {
+//       todosList.push(redisTodo);
+//     }
+//   });
+//   res.json({ msg: "fetch all", todosList });
+// });
 mongoose_1.default
     .connect(mongoUrl)
     .then(() => {

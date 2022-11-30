@@ -3,14 +3,13 @@ import express from "express";
 import cors from "cors";
 import bodyParser from "body-parser";
 import mongoose from "mongoose";
-import bcrypt from "bcrypt";
-import User from "./model/User";
 import Todo from "./model/Todo";
 import jsonwebtoken from "jsonwebtoken";
 import http from "http";
 import { Server } from "socket.io";
 import * as redis from "redis";
 import authRoutes from "./routes/authRoutes";
+import fetchRoutes from "./routes/fetchRoutes";
 import { authenticate } from "./middleware/authenticate";
 
 config();
@@ -78,28 +77,7 @@ io.on("connection", async (socket) => {
 });
 
 app.use("/", authRoutes);
-
-app.use("/fetchAll", <any>authenticate, async (req, res) => {
-  await redisClient.connect();
-  const user: any = (<any>req).user;
-  console.log(user);
-  const userId = user._id;
-  const allTodos = await Todo.find({ userId: userId });
-  const todosList = allTodos.map((todo) => {
-    return todo.todo;
-  });
-  const redisTodos = await redisClient.lRange("BACKEND_TASK_ROSHIN", 0, -1);
-  await redisClient.disconnect();
-  redisTodos.forEach((x) => {
-    const userTodo = x.split(":");
-    const redisUserId = userTodo[0];
-    const redisTodo = userTodo[1];
-    if (userId == redisUserId) {
-      todosList.push(redisTodo);
-    }
-  });
-  res.json({ msg: "fetch all", todosList });
-});
+app.use("/fetchAll", fetchRoutes);
 
 mongoose
   .connect(mongoUrl)
