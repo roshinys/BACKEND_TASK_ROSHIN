@@ -10,7 +10,6 @@ import { Server } from "socket.io";
 import * as redis from "redis";
 import authRoutes from "./routes/authRoutes";
 import fetchRoutes from "./routes/fetchRoutes";
-import { authenticate } from "./middleware/authenticate";
 
 config();
 const app = express();
@@ -27,6 +26,8 @@ const server = http.createServer(app);
 const io = new Server(server);
 
 const redisClient = redis.createClient();
+
+// app.set("redisclient", redisClient);
 
 io.on("connection", async (socket) => {
   socket.on("new-todo", async (result) => {

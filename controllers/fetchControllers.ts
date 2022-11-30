@@ -13,9 +13,9 @@ export const fetchTodo = async (req: Request, res: Response) => {
   const todosList = allTodos.map((todo) => {
     return todo.todo;
   });
+
   const redisTodos = await redisClient.lRange("BACKEND_TASK_ROSHIN", 0, -1);
-  await redisClient.disconnect();
-  redisTodos.forEach((x) => {
+  redisTodos.forEach((x: string) => {
     const userTodo = x.split(":");
     const redisUserId = userTodo[0];
     const redisTodo = userTodo[1];
@@ -23,5 +23,6 @@ export const fetchTodo = async (req: Request, res: Response) => {
       todosList.push(redisTodo);
     }
   });
+  await redisClient.disconnect();
   res.json({ msg: "fetch all", todosList });
 };

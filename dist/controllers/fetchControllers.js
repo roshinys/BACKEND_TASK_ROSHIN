@@ -49,7 +49,6 @@ const fetchTodo = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         return todo.todo;
     });
     const redisTodos = yield redisClient.lRange("BACKEND_TASK_ROSHIN", 0, -1);
-    yield redisClient.disconnect();
     redisTodos.forEach((x) => {
         const userTodo = x.split(":");
         const redisUserId = userTodo[0];
@@ -58,6 +57,7 @@ const fetchTodo = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
             todosList.push(redisTodo);
         }
     });
+    yield redisClient.disconnect();
     res.json({ msg: "fetch all", todosList });
 });
 exports.fetchTodo = fetchTodo;

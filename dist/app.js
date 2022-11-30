@@ -58,6 +58,15 @@ const jwt = jsonwebtoken_1.default;
 const server = http_1.default.createServer(app);
 const io = new socket_io_1.Server(server);
 const redisClient = redis.createClient();
+// console.log(redisClient);
+// {
+//   socket: {
+//     host: "apn1-brave-adder-33713.upstash.io",
+//     port: 33713,
+//   },
+//   password: "69b6358deaf14b44a0f44fbdb31adf8b",
+// }
+// app.set("redisclient", redisClient);
 io.on("connection", (socket) => __awaiter(void 0, void 0, void 0, function* () {
     socket.on("new-todo", (result) => __awaiter(void 0, void 0, void 0, function* () {
         yield redisClient.connect();
@@ -107,27 +116,6 @@ io.on("connection", (socket) => __awaiter(void 0, void 0, void 0, function* () {
 }));
 app.use("/", authRoutes_1.default);
 app.use("/fetchAll", fetchRoutes_1.default);
-// app.use("/fetchAll", <any>authenticate, async (req, res) => {
-//   await redisClient.connect();
-//   const user: any = (<any>req).user;
-//   console.log(user);
-//   const userId = user._id;
-//   const allTodos = await Todo.find({ userId: userId });
-//   const todosList = allTodos.map((todo) => {
-//     return todo.todo;
-//   });
-//   const redisTodos = await redisClient.lRange("BACKEND_TASK_ROSHIN", 0, -1);
-//   await redisClient.disconnect();
-//   redisTodos.forEach((x) => {
-//     const userTodo = x.split(":");
-//     const redisUserId = userTodo[0];
-//     const redisTodo = userTodo[1];
-//     if (userId == redisUserId) {
-//       todosList.push(redisTodo);
-//     }
-//   });
-//   res.json({ msg: "fetch all", todosList });
-// });
 mongoose_1.default
     .connect(mongoUrl)
     .then(() => {
